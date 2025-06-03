@@ -5,36 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 @Injectable()
 export class UsersService {
      private users = [
-        {
-            "id": 1,
-            "name": "Leanne Graham",
-            "email": "Sincere@april.biz",
-            "role": "USER",
-        },
-        {
-            "id": 2,
-            "name": "Ervin Howell",
-            "email": "Shanna@melissa.tv",
-            "role": "USER",
-        },
-        {
-            "id": 3,
-            "name": "Clementine Bauch",
-            "email": "Nathan@yesenia.net",
-            "role": "USER",
-        },
-        {
-            "id": 4,
-            "name": "Patricia Lebsack",
-            "email": "Julianne.OConner@kory.org",
-            "role": "USER",
-        },
-        {
-            "id": 5,
-            "name": "Chelsey Dietrich",
-            "email": "Lucio_Hettinger@annie.ca",
-            "role": "ADMIN",
-        }
+       
     ];
 
    getAll(role?: 'USER' | 'STAFF' | 'ADMIN') {
