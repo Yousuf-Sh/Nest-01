@@ -1,5 +1,6 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -20,7 +21,7 @@ export class UsersService {
             "id": 3,
             "name": "Clementine Bauch",
             "email": "Nathan@yesenia.net",
-            "role": "STAFF",
+            "role": "USER",
         },
         {
             "id": 4,
@@ -36,23 +37,37 @@ export class UsersService {
         }
     ];
 
-    getAll(role?: 'USER' | 'STAFF' | 'ADMIN'){
-        if(!role){
-            return this.users;
-        }
-        return this.users.filter(
-            user => user.role === role
-        );
+   getAll(role?: 'USER' | 'STAFF' | 'ADMIN') {
+    const allowedRoles = ['USER', 'STAFF', 'ADMIN'];
+
+    if (!role) {
+        return this.users;
     }
+
+    if (role && !allowedRoles.includes(role)) {
+        throw new HttpException(`Invalid role: ${role}`, HttpStatus.BAD_REQUEST);
+    }
+
+    const filteredUsers = this.users.filter(user => user.role === role);
+
+    if (filteredUsers.length === 0) {
+        throw new HttpException(`No users found with role: ${role}`, HttpStatus.NOT_FOUND);
+    }
+
+    return filteredUsers;
+}
     show(id:number){
         if(!id){
             throw new HttpException('Bad Request',HttpStatus.BAD_REQUEST);
         }
-        return this.users.filter(
+        const user = this.users.find(
             user => user.id===id
         );
+        if(!user) throw new NotFoundException(`User with id : ${id} does not exist.`);
+
+        return user;
     }
-    store(user:{ name:string,email:string,role: 'USER' | 'STAFF' | 'ADMIN'}){
+    store(user:CreateUserDto){
     const byBiggestId = [...this.users].sort(
         (a,b)=> b.id - a.id
     );
@@ -65,7 +80,7 @@ export class UsersService {
         this.users.push(newUser);
         return newUser;      
     }
-    update(id:number, updateUser:{ name:string,email:string,role: 'USER' | 'STAFF' | 'ADMIN'}){
+    update(id:number, updateUser:UpdateUserDto){
         this.users = this.users.map(user=>{
             if(user.id === id){
                 return {...user,...updateUser}
