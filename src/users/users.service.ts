@@ -46,7 +46,7 @@ export class UsersService {
     }
     show(id:number){
         if(!id){
-            throw new HttpException('Not Found',HttpStatus.NOT_FOUND);
+            throw new HttpException('Bad Request',HttpStatus.BAD_REQUEST);
         }
         return this.users.filter(
             user => user.id===id
@@ -77,6 +77,6 @@ export class UsersService {
     delete(id:number){
         const deletedUser = this.show(id);
         this.users = this.users.filter(user => user.id != id);
-        return deletedUser;
+        return `deleted the following user : ${JSON.stringify(deletedUser)}`;
     }
 }

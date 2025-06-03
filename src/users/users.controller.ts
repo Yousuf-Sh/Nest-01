@@ -1,29 +1,29 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
-import { get } from 'http';
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
+
+    constructor(private readonly userService: UsersService){}
+
     @Get()
-    allUsers(@Query('role') role: 'USER'|'ADMIN'){
-        if(!role){
-            return 'All users';
-        }
-        return 'user with role '+role 
+    allUsers(@Query('role') role?: 'USER'|'ADMIN'){
+        return this.userService.getAll(role); 
     }
     @Get(':id')
     showUser(@Param('id') id: string){
-        return `User with id : ${id}`;
+        return this.userService.show(+id); //unary plus to cast id from string to num
     }
     @Post()
-    createUser(@Body() user:{}){
-        return user;
+    createUser(@Body() user:{ name:string,email:string,role: 'USER' | 'STAFF' | 'ADMIN'}){
+        return this.userService.store(user);
     }
     @Patch(':id')
-    updateUser(@Param('id') id:string, @Body() userUpdate:{}){
-        return {id, ...userUpdate};
+    updateUser(@Param('id') id:string, @Body() userUpdate:{ name:string,email:string,role: 'USER' | 'STAFF' | 'ADMIN'}){
+        return this.userService.update(+id,userUpdate);
     }
     @Delete(':id')
     deleteUser(@Param('id') id:string){
-        return `Deleted user with id ${id}`;
+        return this.userService.delete(+id);
     }
 }
