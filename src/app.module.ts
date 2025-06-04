@@ -4,9 +4,19 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import {ConfigModule, ConfigService} from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MulterModule } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { upload_directory } from './common/constansts';
+import { finalize } from 'rxjs';
 
 @Module({
   imports: [
+    MulterModule.register({
+      dest: upload_directory,
+      limits:{
+        fileSize: 1024*1024*5 //5 MB
+      }
+    }),
     ConfigModule.forRoot({
       isGlobal:true,
     }),

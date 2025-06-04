@@ -42,14 +42,14 @@ export class UsersService {
 
         return user;
     }
-    async store(user:CreateUserDto){
+    async store(user:CreateUserDto,file){
         const newUser = new User();
         
         try{
 
             newUser.name=user.name;
             newUser.email=user.email;
-            newUser.role=user.email;
+            newUser.role=user.role;
             const createdUser = await this.userRepository.save(newUser);
 
             return createdUser;      
