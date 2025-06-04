@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserRole } from './enums/user-role.enum';
+import { upload_directory } from 'src/common/constansts';
 
 @Injectable()
 export class UsersService {
@@ -42,7 +43,7 @@ export class UsersService {
 
         return user;
     }
-    async store(user:CreateUserDto,file){
+    async store(user:CreateUserDto,file: Express.Multer.File){
         const newUser = new User();
         
         try{
@@ -50,6 +51,7 @@ export class UsersService {
             newUser.name=user.name;
             newUser.email=user.email;
             newUser.role=user.role;
+            newUser.image_url = file?  '/uploads/users/'+file.filename : null;
             const createdUser = await this.userRepository.save(newUser);
 
             return createdUser;      

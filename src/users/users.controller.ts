@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query ,ParseIntPipe,ValidationPipe, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query ,ParseIntPipe,ValidationPipe, UseInterceptors, UploadedFile} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -34,7 +34,7 @@ export class UsersController {
             fileFilter: checkFileType,
         })
     )
-        createUser(@Body(ValidationPipe) user:CreateUserDto,
+    async createUser(@Body(ValidationPipe) user:CreateUserDto,
         @UploadedFile() file: Express.Multer.File)
     {
         console.log(file.filename);
