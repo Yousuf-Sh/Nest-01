@@ -1,16 +1,17 @@
 import { Column, Entity, PrimaryGeneratedColumn,CreateDateColumn,UpdateDateColumn } from "typeorm";
 import { UserRole } from "../enums/user-role.enum";
-import { timestamp } from "rxjs";
 
 @Entity()
 export class User{
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column('varchar')
+    @Column({
+        type: 'varchar'
+    })
     name: string;
 
-    @Column('varchar')
+    @Column({type:'varchar'})
     email: string;
     
     @Column({

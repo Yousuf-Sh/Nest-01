@@ -1,68 +1,83 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
+import { UserRole } from './enums/user-role.enum';
 
 @Injectable()
 export class UsersService {
-     private users = [
-       
-    ];
+    constructor(
+        @InjectRepository(User)
+        private readonly userRepository:Repository<User>,
+    ){}
+   
 
-   getAll(role?: 'USER' | 'STAFF' | 'ADMIN') {
-    const allowedRoles = ['USER', 'STAFF', 'ADMIN'];
-
-    if (!role) {
-        return this.users;
-    }
+   async getAll(role?: UserRole) {
+    const allowedRoles = Object.values(UserRole);
 
     if (role && !allowedRoles.includes(role)) {
         throw new HttpException(`Invalid role: ${role}`, HttpStatus.BAD_REQUEST);
     }
 
-    const filteredUsers = this.users.filter(user => user.role === role);
+    const users = role
+        ? await this.userRepository.find({ where: { role } })
+        : await this.userRepository.find();
 
-    if (filteredUsers.length === 0) {
-        throw new HttpException(`No users found with role: ${role}`, HttpStatus.NOT_FOUND);
+    if (users.length === 0) {
+        const roleMsg = role ? ` with role: ${role}` : '';
+        throw new HttpException(`No users found${roleMsg}`, HttpStatus.NOT_FOUND);
     }
 
-    return filteredUsers;
-}
-    show(id:number){
+    return users;
+    }
+
+   async show(id:number){
         if(!id){
             throw new HttpException('Bad Request',HttpStatus.BAD_REQUEST);
         }
-        const user = this.users.find(
-            user => user.id===id
-        );
+        const user = await this.userRepository.find({where:{id}});
         if(!user) throw new NotFoundException(`User with id : ${id} does not exist.`);
 
         return user;
     }
-    store(user:CreateUserDto){
-    const byBiggestId = [...this.users].sort(
-        (a,b)=> b.id - a.id
-    );
-    const newUser = {
-            id : byBiggestId[0].id+1,
-            name : user.name,
-            email : user.email,
-            role : user.role
+    async store(user:CreateUserDto){
+        const newUser = new User();
+        
+        try{
+
+            newUser.name=user.name;
+            newUser.email=user.email;
+            newUser.role=user.email;
+            const createdUser = await this.userRepository.save(newUser);
+
+            return createdUser;      
+        }catch(error){
+
+            console.error('user creation failed :',error.sqlMessage+'\n'+error.sql)
+            throw new InternalServerErrorException('user creation failed');
         }
-        this.users.push(newUser);
-        return newUser;      
     }
-    update(id:number, updateUser:UpdateUserDto){
-        this.users = this.users.map(user=>{
-            if(user.id === id){
-                return {...user,...updateUser}
-            }
-            return user
-        })
-        return this.show(id)   
+    async update(id:number, updateUser:UpdateUserDto){
+        try{
+        await this.userRepository.update({id},updateUser);
+        const updatedData = await this.userRepository.findOneBy({id});
+
+        return updatedData;
+       }catch(e){
+            console.error('Error occured while trying to update user : ',e.sqlMessage+'\n'+e.sql)
+            throw new InternalServerErrorException(e.sqlMessage);
+       }
     }
-    delete(id:number){
-        const deletedUser = this.show(id);
-        this.users = this.users.filter(user => user.id != id);
-        return `deleted the following user : ${JSON.stringify(deletedUser)}`;
+    async delete(id:number){
+        
+        try{
+            await this.userRepository.delete(id);
+            return `deleted the user with id : ${id}`;
+        }catch(e){
+            console.error('Failed to delete user:',e.sqlMessage+'\n'+e.sql);
+            throw new InternalServerErrorException(e.sqlMessage);
+        }
     }
 }
