@@ -1,7 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn,CreateDateColumn,UpdateDateColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn,CreateDateColumn,UpdateDateColumn, ManyToOne, OneToMany } from "typeorm";
 import { UserRole } from "../enums/user-role.enum";
 import { IsOptional } from "class-validator";
 import { tr } from "@faker-js/faker/.";
+import { Post } from "src/posts/entities/post.entity";
 
 @Entity()
 export class User{
@@ -35,5 +36,8 @@ export class User{
 
     @UpdateDateColumn({type: 'timestamp'})
     updated_at: Date;
+
+    @OneToMany(()=>Post,post => post.user)
+    posts: Post[]
 
 }

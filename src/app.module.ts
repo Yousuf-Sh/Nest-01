@@ -8,6 +8,8 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { upload_directory } from './common/constansts';
 import { finalize } from 'rxjs';
+import { PostsModule } from './posts/posts.module';
+import { TagsModule } from './tags/tags.module';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { finalize } from 'rxjs';
       })
     }),
     UsersModule,
+    PostsModule,
+    TagsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

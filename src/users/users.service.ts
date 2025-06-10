@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserRole } from './enums/user-role.enum';
 import { upload_directory } from 'src/common/constansts';
+import { Post } from 'src/posts/entities/post.entity';
 
 @Injectable()
 export class UsersService {
@@ -38,7 +39,10 @@ export class UsersService {
         if(!id){
             throw new HttpException('Bad Request',HttpStatus.BAD_REQUEST);
         }
-        const user = await this.userRepository.find({where:{id}});
+        const user = await this.userRepository.findOne({
+            where:{id},
+            relations:['posts'],
+        });
         if(!user) throw new NotFoundException(`User with id : ${id} does not exist.`);
 
         return user;

@@ -14,11 +14,11 @@ export class UsersController {
     constructor(private readonly userService: UsersService){}
 
     @Get()
-    allUsers(@Query('role') role?:UserRole){
+    async allUsers(@Query('role') role?:UserRole){
         return this.userService.getAll(role); 
     }
     @Get(':id')
-    showUser(@Param('id',ParseIntPipe) id: number){
+    async showUser(@Param('id',ParseIntPipe) id: number){
         return this.userService.show(id); 
     }
 
@@ -37,17 +37,17 @@ export class UsersController {
     async createUser(@Body(ValidationPipe) user:CreateUserDto,
         @UploadedFile() file: Express.Multer.File)
     {
-        console.log(file.filename);
+        // console.log(file.filename);
         return this.userService.store(user,file);
     }
 
     @Patch(':id')
-    updateUser(@Param('id',ParseIntPipe) id:number, @Body(ValidationPipe) userUpdate:UpdateUserDto){
+    async updateUser(@Param('id',ParseIntPipe) id:number, @Body(ValidationPipe) userUpdate:UpdateUserDto){
         return this.userService.update(id,userUpdate);
     }
     
     @Delete(':id')
-    deleteUser(@Param('id',ParseIntPipe) id:number){
+    async deleteUser(@Param('id',ParseIntPipe) id:number){
         return this.userService.delete(id);
     }
 }
