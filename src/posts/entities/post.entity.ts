@@ -17,7 +17,7 @@ export class Post {
     user:User
 
     @ManyToMany(()=> Tag,{
-        cascade:true,eager:true,onDelete:'CASCADE'
+        cascade:true,onDelete:'CASCADE'
     })
     @JoinTable()
     tags: Tag[]; 

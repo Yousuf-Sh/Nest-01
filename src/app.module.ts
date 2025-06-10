@@ -10,6 +10,7 @@ import { upload_directory } from './common/constansts';
 import { finalize } from 'rxjs';
 import { PostsModule } from './posts/posts.module';
 import { TagsModule } from './tags/tags.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { TagsModule } from './tags/tags.module';
     UsersModule,
     PostsModule,
     TagsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

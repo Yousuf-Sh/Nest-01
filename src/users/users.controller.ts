@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query ,ParseIntPipe,ValidationPipe, UseInterceptors, UploadedFile} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query ,ParseIntPipe,ValidationPipe, UseInterceptors, UploadedFile, UseGuards} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -7,6 +7,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { upload_directory } from 'src/common/constansts';
 import { checkFileType, getFilename } from 'src/common/fileUtils';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -17,6 +18,7 @@ export class UsersController {
     async allUsers(@Query('role') role?:UserRole){
         return this.userService.getAll(role); 
     }
+    @UseGuards(AuthGuard)
     @Get(':id')
     async showUser(@Param('id',ParseIntPipe) id: number){
         return this.userService.show(id); 

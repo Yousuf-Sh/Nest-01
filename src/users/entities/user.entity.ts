@@ -24,6 +24,9 @@ export class User{
     })
     role: string;
 
+    @Column({type:'varchar',default:''})
+    password:string
+
     @IsOptional()
     @Column({
         type:'varchar',

@@ -41,9 +41,21 @@ export class UsersService {
         }
         const user = await this.userRepository.findOne({
             where:{id},
-            relations:['posts'],
+            relations:['posts.tags'],
         });
         if(!user) throw new NotFoundException(`User with id : ${id} does not exist.`);
+
+        return user;
+    }
+   async findByEmail(email:string){
+        if(!email){
+            throw new HttpException('Bad Request',HttpStatus.BAD_REQUEST);
+        }
+        const user = await this.userRepository.findOne({
+            where:{email: email},
+            loadEagerRelations: false
+        });
+        if(!user) throw new NotFoundException(`User with id : ${email} does not exist.`);
 
         return user;
     }
@@ -56,6 +68,7 @@ export class UsersService {
             newUser.email=user.email;
             newUser.role=user.role;
             newUser.image_url = file?  '/uploads/users/'+file.filename : null;
+            newUser.password= user.password;
             const createdUser = await this.userRepository.save(newUser);
 
             return createdUser;      
