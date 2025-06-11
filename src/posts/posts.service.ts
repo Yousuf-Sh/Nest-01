@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UseGuards } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,6 +6,8 @@ import { User } from 'src/users/entities/user.entity';
 import { Post } from './entities/post.entity';
 import { In, Repository } from 'typeorm';
 import { Tag } from 'src/tags/entities/tag.entity';
+import { PostOwnerGuard } from './Guards/post_owner.guard';
+import { AuthGuard } from 'src/auth/Guards/auth.guard';
 
 @Injectable()
 export class PostsService {
@@ -43,7 +45,7 @@ export class PostsService {
 
     return post;
   }
-
+  
   update(id: number, updatePostDto: UpdatePostDto) {
     return `This action updates a #${id} post`;
   }

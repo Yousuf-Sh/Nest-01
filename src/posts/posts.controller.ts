@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, ValidationPipe, UseGuards } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { AuthGuard } from 'src/auth/Guards/auth.guard';
+import { PostOwnerGuard } from './Guards/post_owner.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -22,12 +24,13 @@ export class PostsController {
   async findOne(@Param('id' ,ParseIntPipe) id: number) {
     return this.postsService.findOne(+id);
   }
-
+  @UseGuards(AuthGuard,PostOwnerGuard)  
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
     return this.postsService.update(+id, updatePostDto);
   }
 
+  @UseGuards(AuthGuard,PostOwnerGuard)  
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.postsService.remove(+id);
