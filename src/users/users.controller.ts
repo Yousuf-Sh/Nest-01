@@ -7,7 +7,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { upload_directory } from 'src/common/constansts';
 import { checkFileType, getFilename } from 'src/common/fileUtils';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from 'src/auth/Guards/auth.guard';
+import { RoleGuard } from 'src/auth/Guards/role.guard';
+import { Roles } from 'src/Decorators/roles.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -18,7 +20,9 @@ export class UsersController {
     async allUsers(@Query('role') role?:UserRole){
         return this.userService.getAll(role); 
     }
-    @UseGuards(AuthGuard)
+
+    @UseGuards(AuthGuard,RoleGuard)
+    @Roles(UserRole.ADMIN)
     @Get(':id')
     async showUser(@Param('id',ParseIntPipe) id: number){
         return this.userService.show(id); 

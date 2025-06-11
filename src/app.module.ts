@@ -11,6 +11,8 @@ import { finalize } from 'rxjs';
 import { PostsModule } from './posts/posts.module';
 import { TagsModule } from './tags/tags.module';
 import { AuthModule } from './auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { RoleGuard } from './auth/Guards/role.guard';
 
 @Module({
   imports: [
