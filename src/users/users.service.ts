@@ -5,8 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserRole } from './enums/user-role.enum';
-import { upload_directory } from 'src/common/constansts';
-import { Post } from 'src/posts/entities/post.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -55,23 +54,25 @@ export class UsersService {
             where:{email: email},
             loadEagerRelations: false
         });
-        if(!user) throw new NotFoundException(`User with id : ${email} does not exist.`);
+        if(!user) throw new NotFoundException(`User with email ${email} not found`);
 
         return user;
     }
     async store(user:CreateUserDto,file: Express.Multer.File){
         const newUser = new User();
-        
+        const hashedPass = await bcrypt.hash(user.password,10);
         try{
 
             newUser.name=user.name;
             newUser.email=user.email;
             newUser.role=user.role;
             newUser.image_url = file?  '/uploads/users/'+file.filename : null;
-            newUser.password= user.password;
+            newUser.password= hashedPass;
             const createdUser = await this.userRepository.save(newUser);
-
-            return createdUser;      
+            
+            const { password, ...safeUser } = createdUser;
+            return safeUser;
+    
         }catch(error){
 
             console.error('user creation failed :',error.sqlMessage+'\n'+error.sql)
