@@ -5,14 +5,12 @@ import { UsersModule } from './users/users.module';
 import {ConfigModule, ConfigService} from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MulterModule } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 import { upload_directory } from './common/constansts';
-import { finalize } from 'rxjs';
 import { PostsModule } from './posts/posts.module';
 import { TagsModule } from './tags/tags.module';
 import { AuthModule } from './auth/auth.module';
-import { APP_GUARD } from '@nestjs/core';
-import { RoleGuard } from './auth/Guards/role.guard';
+import { MongooseModule } from '@nestjs/mongoose';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -36,14 +34,22 @@ import { RoleGuard } from './auth/Guards/role.guard';
         password: config.get<string>('DB_PASSWORD'),
         database: config.get<string>('DB_NAME'),
         autoLoadEntities: true,
-        synchronize: true // ⚠ remove this KVP in prod
+        synchronize: true // ! ⚠ remove this KVP in prod
         
       })
+    }),
+     MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (config: ConfigService) => ({
+        uri: config.get<string>('MONGO_CONNECTION_URI'),
+      }),
+      inject: [ConfigService],
     }),
     UsersModule,
     PostsModule,
     TagsModule,
     AuthModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
